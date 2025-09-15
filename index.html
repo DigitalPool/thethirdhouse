@@ -319,20 +319,20 @@
           <path d="M499.6,564.9c6.4,0,12.4,1.8,17.7,5.4l81.6,54.4c8.9,5.9,14.2,15.8,14.2,26.5,0,17.6-14.3,31.9-31.8,31.9h-163.3c-17.6,0-31.9-14.3-31.9-31.9s5.3-20.6,14.2-26.5l81.7-54.5c5.3-3.5,11.3-5.3,17.7-5.3M499.6,473.8c-24.4,0-47.9,7.1-68.2,20.6l-81.7,54.5c-34.3,22.8-54.7,61.1-54.7,102.3,0,67.8,55.2,123,123,123h163.3c67.8,0,122.9-55.2,122.9-123s-20.5-79.5-54.7-102.3l-81.7-54.4c-20.3-13.5-43.9-20.7-68.2-20.7h0Z" id="middlePath" fill="none" stroke="white" stroke-width="8"/>
         </svg>
     </div>
-    <div id="text" class="text">This is not a studio.</div>
+    <div id="text" class="text">THIS IS NOT A STUDIO.</div>
   </div>
 
   <!-- Audio for ambient sound -->
   <audio id="ambientSound" loop preload="auto">
-    <source src="./ambient-space-cinematic-music-370754.mp3" type="audio/mpeg">
+    <source src="./ambient-space-cinematic-music-370754.mp3" type="audio/mpeg" opacity="0.3">
   </audio>
 
   <!-- Cinematic Editorial Photo Overlay -->
   <div class="editorial-overlay" id="editorialOverlay">
     <div class="editorial-text">
-      <span class="line">We undress ideas.</span>
-      <span class="line">We build mythologies.</span>
-      <span class="line">We shape presence.</span>
+      <span class="line">WE UNDRESS IDEAS.</span>
+      <span class="line">WE BUILD MYTHOLOGIES.</span>
+      <span class="line">WE SHAPE PRESENCE.</span>
     </div>
   </div>
 
@@ -415,7 +415,7 @@
     setTimeout(() => {
       text.style.opacity = 0;
       setTimeout(() => {
-        text.innerText = "This is The Third House.";
+        text.innerText = "THIS IS THE THIRD HOUSE.";
         text.style.opacity = 1;
         
         // After second text appears, make middle path blink and clickable
@@ -442,7 +442,7 @@
               lines.forEach((line, index) => {
                 setTimeout(() => {
                   line.classList.add('show');
-                }, 800 + (index * 600)); // Stagger each line by 600ms
+                }, 1200 + (index * 2000)); // Stagger each line by 2000ms (2 seconds)
               });
               
               // After editorial content displays, fade to main site
@@ -453,7 +453,7 @@
                   // Fade out ambient music when main site loads
                   fadeOutAmbientSound();
                 }, 1000); // Wait for editorial to fade out
-              }, 5000); // Show editorial for 5 seconds
+              }, 7000); // Show editorial for 7 seconds
             }, 500);
           });
         }, 1000);
