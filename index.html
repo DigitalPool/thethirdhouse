@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Third House – Animation Demo</title>
+  <style>
+    /* Reset */
+    * {margin:0; padding:0; box-sizing:border-box;}
+
+    body, html {
+      width:100%;
+      height:100%;
+      background:#000;
+      overflow:hidden;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color:#fff;
+    }
+
+    .container {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      text-align:center;
+    }
+
+    svg {
+      width:200px;
+      height:auto;
+      opacity:0;
+    }
+
+    .text {
+      margin-top:2rem;
+      font-size:1.5rem;
+      opacity:0;
+      transition:opacity 1s ease;
+    }
+
+    /* Pulsing logo */
+    .pulse {
+      animation:pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform:scale(1); opacity:1; }
+      50% { transform:scale(1.05); opacity:0.8; }
+      100% { transform:scale(1); opacity:1; }
+    }
+
+    /* Blinking middle path */
+    .blink {
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0% { fill: white; opacity: 1; }
+      50% { fill: white; opacity: 0.3; }
+      100% { fill: white; opacity: 1; }
+    }
+
+    /* Clickable cursor */
+    .clickable {
+      cursor: pointer;
+    }
+
+    /* Door opening animation */
+    .door-opening {
+      animation: doorSwing 1.5s ease-in-out forwards;
+      transform-origin: 386px 500px; /* Left side of the door as hinge */
+      fill: white !important; /* Keep white fill when door opens */
+    }
+    @keyframes doorSwing {
+      0% { transform: rotateY(0deg); fill: white; }
+      100% { transform: rotateY(-120deg); fill: white; }
+    }
+
+    /* Main site content (initially hidden) */
+    .main-site {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1s ease, visibility 1s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .main-site.show {
+      opacity: 1;
+      visibility: visible;
+      z-index: 20;
+    }
+
+    .main-site h1 {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .main-site p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .main-site nav {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .main-site nav a {
+      color: white;
+      text-decoration: none;
+      padding: 0.8rem 1.5rem;
+      border: 1px solid white;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+    }
+
+    .main-site nav a:hover {
+      background: white;
+      color: black;
+    }
+
+    /* Cinematic Editorial Photo Overlay */
+    .editorial-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)), 
+                  url('./cinematic_hero.png'),
+                  url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.03"/><circle cx="75" cy="75" r="0.5" fill="white" opacity="0.02"/><circle cx="50" cy="10" r="0.8" fill="white" opacity="0.025"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      background-size: cover, cover, 200px 200px;
+      background-position: center, center, 0 0;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 2s ease, visibility 2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      filter: grayscale(100%) contrast(1.2);
+    }
+
+    .editorial-overlay.show {
+      opacity: 1;
+      visibility: visible;
+      z-index: 15;
+    }
+
+    /* Container fade out when door opens */
+    .container.fade-out {
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+
+    .editorial-text {
+      font-family: 'Playfair Display', 'Times New Roman', serif;
+      font-size: 2.5rem;
+      font-weight: 300;
+      line-height: 1.4;
+      text-align: center;
+      max-width: 800px;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      letter-spacing: 0.02em;
+    }
+
+    .editorial-text .line {
+      display: block;
+      margin-bottom: 1rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .editorial-text .line.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Film grain animation */
+    @keyframes filmGrain {
+      0% { background-position: center, 0 0; }
+      25% { background-position: center, -3px -2px; }
+      50% { background-position: center, -5px 3px; }
+      75% { background-position: center, 2px -4px; }
+      100% { background-position: center, 0 0; }
+    }
+
+    .editorial-overlay.animate-grain {
+      animation: filmGrain 8s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="logo">
+      <!-- Inline SVG for easy animation -->
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!-- The Third House Logo Icon.svg here -->
+      <?xml version="1.0" encoding="UTF-8"?>
+        <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1000 1000">
+          <!-- Generator: Adobe Illustrator 29.7.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 8)  -->
+          <path d="M866.4,325.5c-8.7,0-17.5-2.5-25.2-7.7l-288.1-192.1c-32.5-21.7-74.6-21.7-107.1,0l-288.1,192.1c-20.9,13.9-49.2,8.3-63.2-12.6-14-20.9-8.3-49.2,12.6-63.2L395.5,50c63.2-42.1,144.9-42.1,208.2,0l288.1,192.1c20.9,14,26.6,42.2,12.6,63.2-8.8,13.2-23.2,20.3-37.9,20.3Z" fill="none" stroke="white" stroke-width="8"/>
+          <path d="M499.5,308.2l321.7,214.5v368.6H177.8v-368.6l321.7-214.5M499.6,216.6c-17.6,0-34.6,5.1-49.2,14.9L126.2,447.6c-24.7,16.5-39.5,44-39.5,73.7v372.3c0,48.9,39.8,88.6,88.6,88.6h648.4c48.9,0,88.6-39.8,88.6-88.6v-372.3c0-29.7-14.8-57.3-39.5-73.7l-324.2-216.1c-14.6-9.7-31.6-14.9-49.2-14.9h0Z" fill="none" stroke="white" stroke-width="8"/>
+          <path d="M499.6,564.9c6.4,0,12.4,1.8,17.7,5.4l81.6,54.4c8.9,5.9,14.2,15.8,14.2,26.5,0,17.6-14.3,31.9-31.8,31.9h-163.3c-17.6,0-31.9-14.3-31.9-31.9s5.3-20.6,14.2-26.5l81.7-54.5c5.3-3.5,11.3-5.3,17.7-5.3M499.6,473.8c-24.4,0-47.9,7.1-68.2,20.6l-81.7,54.5c-34.3,22.8-54.7,61.1-54.7,102.3,0,67.8,55.2,123,123,123h163.3c67.8,0,122.9-55.2,122.9-123s-20.5-79.5-54.7-102.3l-81.7-54.4c-20.3-13.5-43.9-20.7-68.2-20.7h0Z" id="middlePath" fill="none" stroke="white" stroke-width="8"/>
+        </svg>
+    </div>
+    <div id="text" class="text">This is not a studio.</div>
+  </div>
+
+  <!-- Audio for ambient sound -->
+  <audio id="ambientSound" loop preload="auto">
+    <source src="./ambient-space-cinematic-music-370754.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Cinematic Editorial Photo Overlay -->
+  <div class="editorial-overlay" id="editorialOverlay">
+    <div class="editorial-text">
+      <span class="line">We undress ideas.</span>
+      <span class="line">We build mythologies.</span>
+      <span class="line">We shape presence.</span>
+    </div>
+  </div>
+
+  <!-- Main site content (hidden initially) -->
+  <div class="main-site" id="mainSite">
+    <h1>Welcome to The Third House</h1>
+    <p>We are a creative collective that challenges conventional boundaries between art, technology, and human experience. Step into our world where innovation meets imagination.</p>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#work">Our Work</a>
+      <a href="#contact">Contact</a>
+      <a href="#team">Team</a>
+    </nav>
+  </div>
+
+  <script>
+    const logo = document.querySelector('svg');
+    const text = document.getElementById('text');
+    const middlePath = document.getElementById('middlePath');
+    const mainSite = document.getElementById('mainSite');
+    const editorialOverlay = document.getElementById('editorialOverlay');
+    const ambientSound = document.getElementById('ambientSound');
+    const container = document.querySelector('.container');
+
+    // Set up ambient music
+    ambientSound.volume = 0.3; // Set initial volume
+
+    // Function to fade out ambient sound
+    function fadeOutAmbientSound() {
+      const fadeOutInterval = setInterval(() => {
+        if (ambientSound.volume > 0.05) {
+          ambientSound.volume -= 0.02;
+        } else {
+          ambientSound.volume = 0;
+          ambientSound.pause();
+          clearInterval(fadeOutInterval);
+        }
+      }, 100); // Fade out over ~1.5 seconds
+    }
+
+    // Start ambient music at the beginning
+    // Try to start immediately when page loads
+    ambientSound.play().catch(error => {
+      console.log('Audio autoplay blocked:', error);
+      // Audio will start on first user interaction instead
+    });
+
+    // Fade in logo
+    setTimeout(() => {
+      logo.style.transition = "opacity 2s ease";
+      logo.style.opacity = 1;
+      logo.classList.add("pulse");
+    }, 500);
+
+    // Show first text
+    setTimeout(() => {
+      text.style.opacity = 1;
+    }, 2500);
+
+    // Switch to second text
+    setTimeout(() => {
+      text.style.opacity = 0;
+      setTimeout(() => {
+        text.innerText = "This is The Third House.";
+        text.style.opacity = 1;
+        
+        // After second text appears, make middle path blink and clickable
+        setTimeout(() => {
+          middlePath.classList.add("blink", "clickable");
+          
+          // Add click event listener
+          middlePath.addEventListener('click', function() {
+            // Stop blinking
+            middlePath.classList.remove("blink");
+            
+            // Start ambient music if not already playing (in case autoplay was blocked)
+            if (ambientSound.paused) {
+              ambientSound.play().catch(error => console.log('Audio play failed:', error));
+            }
+            
+            // Start door opening animation
+            middlePath.classList.add("door-opening");
+            
+            // Fade out the logo container to reveal hero section
+            container.classList.add("fade-out");
+            
+            // Show editorial overlay after door starts opening
+            setTimeout(() => {
+              editorialOverlay.classList.add('show', 'animate-grain');
+              
+              // Animate text lines appearing
+              const lines = editorialOverlay.querySelectorAll('.line');
+              lines.forEach((line, index) => {
+                setTimeout(() => {
+                  line.classList.add('show');
+                }, 800 + (index * 600)); // Stagger each line by 600ms
+              });
+              
+              // After editorial content displays, fade to main site
+              setTimeout(() => {
+                editorialOverlay.classList.remove('show');
+                setTimeout(() => {
+                  mainSite.classList.add('show');
+                  // Fade out ambient music when main site loads
+                  fadeOutAmbientSound();
+                }, 1000); // Wait for editorial to fade out
+              }, 5000); // Show editorial for 5 seconds
+            }, 500);
+          });
+        }, 1000);
+      }, 1000);
+    }, 5500);
+  </script>
+</body>
+</html>
