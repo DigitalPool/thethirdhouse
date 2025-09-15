@@ -261,6 +261,7 @@
 
     // Set up ambient music
     ambientSound.volume = 0.3; // Set initial volume
+    let audioStarted = false; // Track if audio has started
 
     // Function to fade out ambient sound
     function fadeOutAmbientSound() {
@@ -275,11 +276,29 @@
       }, 100); // Fade out over ~1.5 seconds
     }
 
+    // Function to start audio on user interaction
+    function startAudioOnInteraction() {
+      if (!audioStarted) {
+        ambientSound.play().then(() => {
+          audioStarted = true;
+          console.log('Audio started successfully');
+        }).catch(error => {
+          console.log('Audio play failed:', error);
+        });
+      }
+    }
+
     // Start ambient music at the beginning
     // Try to start immediately when page loads
-    ambientSound.play().catch(error => {
-      console.log('Audio autoplay blocked:', error);
-      // Audio will start on first user interaction instead
+    ambientSound.play().then(() => {
+      audioStarted = true;
+      console.log('Audio autoplay successful');
+    }).catch(error => {
+      console.log('Audio autoplay blocked - will start on user interaction');
+      // Add event listeners for user interaction to start audio
+      document.addEventListener('click', startAudioOnInteraction, { once: true });
+      document.addEventListener('keydown', startAudioOnInteraction, { once: true });
+      document.addEventListener('touchstart', startAudioOnInteraction, { once: true });
     });
 
     // Fade in logo
@@ -309,11 +328,6 @@
           middlePath.addEventListener('click', function() {
             // Stop blinking
             middlePath.classList.remove("blink");
-            
-            // Start ambient music if not already playing (in case autoplay was blocked)
-            if (ambientSound.paused) {
-              ambientSound.play().catch(error => console.log('Audio play failed:', error));
-            }
             
             // Start door opening animation
             middlePath.classList.add("door-opening");
